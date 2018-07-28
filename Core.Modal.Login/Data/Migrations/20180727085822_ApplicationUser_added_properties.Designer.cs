@@ -11,9 +11,10 @@ using System;
 namespace Core.Modal.Login.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20180727085822_ApplicationUser_added_properties")]
+    partial class ApplicationUser_added_properties
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,8 +43,6 @@ namespace Core.Modal.Login.Data.Migrations
                     b.Property<bool>("LockoutEnabled");
 
                     b.Property<DateTimeOffset?>("LockoutEnd");
-
-                    b.Property<DateTime>("LoginTime");
 
                     b.Property<string>("NormalizedEmail")
                         .HasMaxLength(256);

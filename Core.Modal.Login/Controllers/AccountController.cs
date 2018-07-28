@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Core.Modal.Login.Models;
 using Core.Modal.Login.Models.AccountViewModels;
 using Core.Modal.Login.Services;
+using Core.Modal.Login.Data;
 
 namespace Core.Modal.Login.Controllers
 {
@@ -24,17 +25,20 @@ namespace Core.Modal.Login.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ILogger _logger;
+        private readonly ApplicationDbContext _context;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             IEmailSender emailSender,
-            ILogger<AccountController> logger)
+            ILogger<AccountController> logger,
+            ApplicationDbContext context)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
             _logger = logger;
+            _context = context;
         }
 
         [TempData]
@@ -59,30 +63,11 @@ namespace Core.Modal.Login.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-                if (result.Succeeded)
-                {
-                    _logger.LogInformation("User logged in.");
-                    return RedirectToLocal(returnUrl);
-                }
-                if (result.RequiresTwoFactor)
-                {
-                    return RedirectToAction(nameof(LoginWith2fa), new { returnUrl, model.RememberMe });
-                }
-                if (result.IsLockedOut)
-                {
-                    _logger.LogWarning("User account locked out.");
-                    return RedirectToAction(nameof(Lockout));
-                }
-                else
-                {
-                    ModelState.AddModelError(string.Empty, "Invalid login attempt.");
-                    return View(model);
-                }
+                ApplicationUser user = _context.Users.Where(u=>u.Pin == model.Pin).SingleOrDefault();
+                UpdateLogin(model.Pin);
+                await _signInManager.SignInAsync(user, false);
+                return RedirectToLocal(returnUrl);
             }
-
             // If we got this far, something failed, redisplay form
             return View(model);
         }
@@ -220,7 +205,18 @@ namespace Core.Modal.Login.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                //move to methods
+                var username = string.Format($"{model.FirstName.FirstCharToUpper()}.{model.LastName.FirstCharToUpper()}");
+                var email = string.Format($"{username}@example.com");
+                Random rnd = new Random();
+                //TODO Check for unique pins 1-1 with user
+                var pin = rnd.Next(1000, 9999).ToString();
+
+                var user = new ApplicationUser {
+                    UserName = username,
+                    Pin = pin,
+                    Email = email,
+                };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -228,7 +224,7 @@ namespace Core.Modal.Login.Controllers
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     var callbackUrl = Url.EmailConfirmationLink(user.Id, code, Request.Scheme);
-                    await _emailSender.SendEmailConfirmationAsync(model.Email, callbackUrl);
+                    await _emailSender.SendEmailConfirmationAsync(email, callbackUrl);
 
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     _logger.LogInformation("User created a new account with password.");
@@ -459,6 +455,23 @@ namespace Core.Modal.Login.Controllers
             }
         }
 
+        public void UpdateLogin(string pin)
+        {
+            ApplicationUser user = _context.Users.Where(u => u.Pin == pin).SingleOrDefault();
+           // session.LoginTime = DateTime.UtcNow;
+        }
         #endregion
+    }
+    public static class StringExtensions
+    {
+        public static string FirstCharToUpper(this string input)
+        {
+            switch (input)
+            {
+                case null: throw new ArgumentNullException(nameof(input));
+                case "": throw new ArgumentException($"{nameof(input)} cannot be empty", nameof(input));
+                default: return input.First().ToString().ToUpper() + input.Substring(1);
+            }
+        }
     }
 }

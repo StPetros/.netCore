@@ -61,7 +61,8 @@ namespace Core.Modal.Login.Controllers
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 IsEmailConfirmed = user.EmailConfirmed,
-                StatusMessage = StatusMessage
+                StatusMessage = StatusMessage,
+                Pin = user.Pin,
             };
 
             return View(model);

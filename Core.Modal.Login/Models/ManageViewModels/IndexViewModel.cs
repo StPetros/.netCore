@@ -9,9 +9,10 @@ namespace Core.Modal.Login.Models.ManageViewModels
     public class IndexViewModel
     {
         public string Username { get; set; }
+        public string Pin { get; set; }
 
         public bool IsEmailConfirmed { get; set; }
-
+        public DateTime LoginTime { get; set; }
         [Required]
         [EmailAddress]
         public string Email { get; set; }

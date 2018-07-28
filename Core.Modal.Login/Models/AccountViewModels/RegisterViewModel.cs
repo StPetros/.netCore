@@ -8,10 +8,16 @@ namespace Core.Modal.Login.Models.AccountViewModels
 {
     public class RegisterViewModel
     {
-        [Required]
-        [EmailAddress]
-        [Display(Name = "Email")]
-        public string Email { get; set; }
+        //[Required]
+        //[EmailAddress]
+        //[Display(Name = "Email")]
+        //public string Email { get; set; }
+
+        //public string Username { get; set;}
+        //public string Pin { get; set; }
+
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
 
         [Required]
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]

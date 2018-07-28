@@ -9,10 +9,13 @@ namespace Core.Modal.Login.Models.AccountViewModels
     public class LoginViewModel
     {
         [Required]
+        public string Pin { get; set; }
+
+        
         [EmailAddress]
         public string Email { get; set; }
 
-        [Required]
+        
         [DataType(DataType.Password)]
         public string Password { get; set; }
 
