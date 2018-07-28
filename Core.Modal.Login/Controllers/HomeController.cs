@@ -5,11 +5,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Core.Modal.Login.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace Core.Modal.Login.Controllers
 {
     public class HomeController : Controller
     {
+
         public IActionResult Index()
         {
             return View();
@@ -17,8 +19,13 @@ namespace Core.Modal.Login.Controllers
 
         public IActionResult About()
         {
-            ViewData["Message"] = "Your application description page.";
-
+            var time = HttpContext.Session.GetString("Login_Session");
+            if (string.IsNullOrEmpty(time))
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var str = HttpContext.Session.GetString("Login_Session");
+            ViewData["Session"] = str;
             return View();
         }
 

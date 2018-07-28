@@ -32,7 +32,12 @@ namespace Core.Modal.Login
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
-
+            //Add session state
+            services.AddDistributedMemoryCache();
+            services.AddSession(options => {
+                //Set session duration
+                options.IdleTimeout = TimeSpan.FromSeconds(10);
+            });
             // Add application services.
             services.AddTransient<IEmailSender, EmailSender>();
 
@@ -54,9 +59,8 @@ namespace Core.Modal.Login
             }
 
             app.UseStaticFiles();
-
             app.UseAuthentication();
-
+            app.UseSession();
             app.UseMvc(routes =>
             {
                 routes.MapRoute(

@@ -14,6 +14,8 @@ using Core.Modal.Login.Models;
 using Core.Modal.Login.Models.AccountViewModels;
 using Core.Modal.Login.Services;
 using Core.Modal.Login.Data;
+using Newtonsoft.Json;
+using Microsoft.AspNetCore.Http;
 
 namespace Core.Modal.Login.Controllers
 {
@@ -63,7 +65,7 @@ namespace Core.Modal.Login.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                ApplicationUser user = _context.Users.Where(u=>u.Pin == model.Pin).SingleOrDefault();
+                ApplicationUser user = _context.Users.Where(u => u.Pin == model.Pin).SingleOrDefault();
                 UpdateLogin(model.Pin);
                 await _signInManager.SignInAsync(user, false);
                 return RedirectToLocal(returnUrl);
@@ -457,8 +459,14 @@ namespace Core.Modal.Login.Controllers
 
         public void UpdateLogin(string pin)
         {
-            ApplicationUser user = _context.Users.Where(u => u.Pin == pin).SingleOrDefault();
-           // session.LoginTime = DateTime.UtcNow;
+            // session.LoginTime = DateTime.UtcNow;
+            var loginSession = "Login_Session";
+            var str = JsonConvert.SerializeObject(new SessionModel()
+            {
+                Pin = pin,
+                LoginTime = DateTime.UtcNow
+            });
+            HttpContext.Session.SetString(loginSession, str);
         }
         #endregion
     }
