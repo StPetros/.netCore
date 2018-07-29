@@ -12,14 +12,16 @@ namespace Core.Modal.Login.Controllers
     public class HomeController : Controller
     {
 
-        public IActionResult Index()
+        public IActionResult Index(JsModel model)
         {
-            return View();
+            model.OpenModalJs = "ShowErrorPopup()";
+            return View(model);
         }
 
         public IActionResult About()
         {
             var time = HttpContext.Session.GetString("Login_Session");
+
             if (string.IsNullOrEmpty(time))
             {
                 return RedirectToAction("Login", "Account");
