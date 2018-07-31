@@ -71,13 +71,8 @@
     @RenderSection("Scripts", required: false)
     <!-- Modal -->
     @Html.Partial("_LoginPartialForm")
-
     <script type="text/javascript">
         @Model.OpenModalJs
-
-        function ShowErrorPopup() {
-            alert('Sorry, we could not process your order.');
-        }
     </script>
 </body>
 </html>
