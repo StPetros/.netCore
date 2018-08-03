@@ -1,3 +1,7 @@
+@{
+    Layout = null;
+}
+
 @using Microsoft.AspNetCore.Identity
 @using Core.Modal.Login.Models
 
@@ -22,7 +26,7 @@ else
     <ul class="nav navbar-nav navbar-right">
         <li>
             <a asp-area="" asp-controller="Account" asp-action="Login" data-toggle="modal" data-target="#loginModal">
-                <p>Log in</p>
+                <p id="loginLink">Log in</p>
             </a>
         </li>
     </ul>
