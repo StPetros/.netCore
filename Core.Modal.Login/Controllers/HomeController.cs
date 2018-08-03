@@ -14,28 +14,32 @@ namespace Core.Modal.Login.Controllers
 
         public IActionResult Index(JsModel model)
         {
-            model.OpenModalJs = "ShowErrorPopup()";
             return View(model);
         }
 
-        public IActionResult About()
+        public IActionResult About(JsModel model)
         {
             var time = HttpContext.Session.GetString("Login_Session");
 
             if (string.IsNullOrEmpty(time))
             {
-                return RedirectToAction("Login", "Account");
+                model.OpenModalJs = "ShowErrorPopup()";
             }
             var str = HttpContext.Session.GetString("Login_Session");
             ViewData["Session"] = str;
-            return View();
+            return View(model);
         }
 
-        public IActionResult Contact()
+        public IActionResult Contact(JsModel model)
         {
-            ViewData["Message"] = "Your contact page.";
+            var time = HttpContext.Session.GetString("Login_Session");
 
-            return View();
+            if (string.IsNullOrEmpty(time))
+            {
+                model.OpenModalJs = "ShowErrorPopup()";
+            }
+            ViewData["Message"] = "Your contact page.";
+            return View(model);
         }
 
         public IActionResult Error()
